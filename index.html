@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Precise Location</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #location { margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Get Your Precise Current Location</h1>
+    <button onclick="getLocation()">Get Location</button>
+    <div id="location"></div>
+    <script>
+        function getLocation() {
+            const locationDiv = document.getElementById('location');
+            if (!navigator.geolocation) {
+                locationDiv.textContent = 'Geolocation is not supported by your browser.';
+                return;
+            }
+            locationDiv.textContent = 'Locating…';
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    locationDiv.innerHTML = `<strong>Latitude:</strong> ${lat}<br><strong>Longitude:</strong> ${lon}<br><strong>Accuracy:</strong> ${accuracy} meters`;
+                },
+                (error) => {
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            locationDiv.textContent = 'User denied the request for Geolocation.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            locationDiv.textContent = 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            locationDiv.textContent = 'The request to get user location timed out.';
+                            break;
+                        default:
+                            locationDiv.textContent = 'An unknown error occurred.';
+                            break;
+                    }
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+    </script>
+</body>
+</html>

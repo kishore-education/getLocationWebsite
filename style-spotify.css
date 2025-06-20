@@ -1,0 +1,140 @@
+body {
+  background: linear-gradient(135deg, #181818 0%, #282828 100%);
+  font-family: 'Circular Std', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1 {
+  color: #fff;
+  text-align: center;
+  font-size: 2.2em;
+  margin-top: 40px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+button {
+  font-family: inherit;
+  font-size: 1em;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 32px;
+  background: #1db954;
+  color: #fff;
+  font-weight: 600;
+  margin: 20px auto 30px auto;
+  display: block;
+  box-shadow: 0 2px 8px #0003;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #1ed760;
+}
+
+#music-player {
+  background: #181818;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px #0005;
+  max-width: 420px;
+  margin: 40px auto 0 auto;
+  padding: 36px 28px 28px 28px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+
+#cover-art img {
+  width: 140px;
+  height: 140px;
+  border-radius: 16px;
+  background: #222;
+  box-shadow: 0 2px 12px #0006;
+}
+
+#song-title {
+  font-size: 1.25em;
+  font-weight: 700;
+  margin: 18px 0 10px 0;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+audio {
+  width: 100%;
+  margin-bottom: 12px;
+  outline: none;
+  background: #222;
+  border-radius: 8px;
+}
+
+#playlist {
+  margin-top: 24px;
+  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #222;
+  padding: 12px 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0002;
+}
+#playlist div {
+  padding: 8px 0 8px 8px;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1em;
+  transition: background 0.15s, color 0.15s;
+}
+#playlist div.active, #playlist div:hover {
+  background: #1db95433;
+  color: #1db954;
+}
+
+#music-player button {
+  background: #282828;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 50%;
+  font-size: 1.3em;
+  margin: 0 12px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px #0002;
+}
+#music-player button#play-btn {
+  background: #1db954;
+  color: #fff;
+  font-size: 1.5em;
+  padding: 14px 24px;
+}
+#music-player button#play-btn:hover {
+  background: #1ed760;
+}
+#music-player button:hover {
+  background: #333;
+  color: #1db954;
+}
+
+#output {
+  background: #222;
+  color: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  max-width: 420px;
+  margin: 24px auto;
+  display: none;
+  font-size: 1em;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: #222;
+}
+::-webkit-scrollbar-thumb {
+  background: #1db95455;
+  border-radius: 8px;
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Telegram Image and Audio Display</title>
+</head>
+<body>
+  <h2>Telegram Image and Audio Display</h2>
+  <button id="downloadCsvBtn" style="margin-bottom:10px;display:none;">Download CSV</button>
+  <div id="songList"></div>
+  <div id="content"><p>Select a song to display image and audio.</p></div>
+  <script>
+    const TELEGRAM_BOT_TOKEN = '7311171550:AAGXZ6fQWsPO30_FRZl3MCgXssvRaYFgiQM';
+    const CSV_URL = 'https://raw.githubusercontent.com/kishore-education/Mus/refs/heads/main/songs_metadata.csv';
+
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/).filter(line => line.trim());
+      const headers = lines[0].split(',');
+      return lines.slice(1).map(line => {
+        const values = line.match(/(?:"[^"]*"|[^,])+/g) || line.split(',');
+        const obj = {};
+        headers.forEach((h, i) => {
+          obj[h.trim()] = (values[i] || '').replace(/^"|"$/g, '').replace(/&quot;/g, '"');
+        });
+        return obj;
+      });
+    }
+
+    async function getFileUrl(file_id) {
+      const resp = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile?file_id=${file_id}`);
+      const data = await resp.json();
+      if (data.ok && data.result && data.result.file_path) {
+        return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${data.result.file_path}`;
+      }
+      return null;
+    }
+
+    async function displayMedia(imageFileId, audioFileId) {
+      const contentDiv = document.getElementById('content');
+      contentDiv.innerHTML = '<p>Loading image and audio...</p>';
+      const [imageUrl, audioUrl] = await Promise.all([
+        getFileUrl(imageFileId),
+        getFileUrl(audioFileId)
+      ]);
+      if (!imageUrl && !audioUrl) {
+        contentDiv.innerHTML = '<p>Failed to load image and audio.</p>';
+        return;
+      }
+      let html = '';
+      if (imageUrl) {
+        html += `<img src="${imageUrl}" alt="Telegram Image" style="max-width:300px;display:block;margin-bottom:20px;">`;
+      }
+      if (audioUrl) {
+        html += `<audio controls src="${audioUrl}" style="width:100%;"></audio>`;
+      }
+      contentDiv.innerHTML = html;
+    }
+
+    let loadedCsvText = '';
+    async function loadAndDisplaySongs() {
+      const songListDiv = document.getElementById('songList');
+      songListDiv.innerHTML = '<p>Loading songs...</p>';
+      try {
+        const resp = await fetch(CSV_URL);
+        const text = await resp.text();
+        loadedCsvText = text;
+        document.getElementById('downloadCsvBtn').style.display = 'inline-block';
+        const csvData = parseCSV(text);
+        if (!csvData.length) {
+          songListDiv.innerHTML = '<p>No songs found in CSV.</p>';
+          return;
+        }
+        let html = '<ul style="list-style:none;padding:0;">';
+        csvData.forEach((song, idx) => {
+          html += `<li style="margin-bottom:10px;"><button data-idx="${idx}" style="padding:5px 10px;">${song.song_name || 'Unknown Song'}</button></li>`;
+        });
+        html += '</ul>';
+        songListDiv.innerHTML = html;
+        songListDiv.querySelectorAll('button').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const song = csvData[this.getAttribute('data-idx')];
+            displayMedia(song.image_file_id, song.audio_file_id);
+          });
+        });
+      } catch (e) {
+        songListDiv.innerHTML = '<p>Failed to load CSV file.</p>';
+      }
+    }
+
+    document.getElementById('downloadCsvBtn').addEventListener('click', function() {
+      if (!loadedCsvText) return;
+      const blob = new Blob([loadedCsvText], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'songs_metadata.csv';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    });
+
+    loadAndDisplaySongs();
+  </script>
+</body>
+</html>
